@@ -734,6 +734,15 @@ template<typename T> void ok_generic_lambda_coawait_PR41909() {
 }
 template void ok_generic_lambda_coawait_PR41909<int>(); // expected-note {{in instantiation of function template specialization 'ok_generic_lambda_coawait_PR41909<int>' requested here}}
 
+void ok_generic_lambda_coawait_PR41909_2() {
+  [](auto &arg) -> coro<good_promise_1> { // expected-warning {{expression result unused}}
+    co_await 12;
+  };
+  [](auto &arg) -> coro<good_promise_1> {
+    co_await 24;
+  }("argument");
+}
+
 template<> struct std::experimental::coroutine_traits<int, int, const char**>
 { using promise_type = promise; };
 

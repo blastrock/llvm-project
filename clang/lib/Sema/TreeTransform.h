@@ -7229,16 +7229,7 @@ TreeTransform<Derived>::TransformCoroutineBodyStmt(CoroutineBodyStmt *S) {
   Builder.ReturnValue = Res.get();
 
   if (S->hasDependentPromiseType()) {
-    // PR41909: We may find a generic coroutine lambda definition within a
-    // template function that is being instantiated. In this case, the lambda
-    // will have a dependent promise type, until it is used in an expression
-    // that creates an instantiation with a non-dependent promise type. We
-    // should not assert or build coroutine dependent statements for such a
-    // generic lambda.
-    auto *MD = dyn_cast_or_null<CXXMethodDecl>(FD);
-    if (!MD || !MD->getParent()->isGenericLambda()) {
-      assert(!Promise->getType()->isDependentType() &&
-             "the promise type must no longer be dependent");
+    if (!Promise->getType()->isDependentType()) {
       assert(!S->getFallthroughHandler() && !S->getExceptionHandler() &&
              !S->getReturnStmtOnAllocFailure() && !S->getDeallocate() &&
              "these nodes should not have been built yet");
